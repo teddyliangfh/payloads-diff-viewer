@@ -4,7 +4,7 @@
       <!-- Header -->
       <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-gray-900 mb-2">Payload Diff Viewer</h1>
-        <p class="text-gray-600">Compare JSON payloads and visualize differences</p>
+        <p class="text-gray-700">Compare JSON payloads and visualize differences</p>
       </div>
 
       <!-- Status Bar -->

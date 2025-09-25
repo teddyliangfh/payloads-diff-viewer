@@ -1,8 +1,8 @@
 <template>
-  <div v-if="loading" class="bg-white rounded-lg border p-6 mb-6">
+  <div v-if="loading" class="bg-white rounded-lg border border-gray-200 p-6 mb-6 shadow-sm">
     <div class="flex items-center justify-center">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      <span class="ml-3 text-gray-600">{{ loadingMessage }}</span>
+      <span class="ml-3 text-gray-700">{{ loadingMessage }}</span>
     </div>
   </div>
 </template>

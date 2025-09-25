@@ -1,239 +1,110 @@
 /**
- * Payload comparison utility for detecting differences between product data
- * Handles nested objects, arrays, and various data types
+ * Simple JSON object comparison utility
+ * Compares two objects recursively and records changes
  */
 
-import type {
-  ProductImage,
-  ProductVariant,
-  ProductPayload,
-  DiffResult,
-  ComparisonResult,
-  ValidationResult
-} from '../types/payload.types'
+export interface DiffResult {
+  path: string
+  type: 'added' | 'removed' | 'modified'
+  oldValue?: any
+  newValue?: any
+}
+
+export interface ComparisonResult {
+  hasChanges: boolean
+  totalChanges: number
+  diffs: DiffResult[]
+}
 
 /**
- * Deep comparison function to detect differences between two objects
+ * Simple deep comparison of two objects
  */
-export function comparePayloads(payload1: ProductPayload, payload2: ProductPayload): ComparisonResult {
+export function compareObjects(obj1: any, obj2: any, path: string = ''): ComparisonResult {
   const diffs: DiffResult[] = []
   
-  // Compare basic fields
-  compareBasicFields(payload1, payload2, diffs)
-  
-  // Compare images array
-  compareImages(payload1.images, payload2.images, diffs)
-  
-  // Compare variants array
-  compareVariants(payload1.variants, payload2.variants, diffs)
-  
-  // Calculate summary
-  const summary = calculateSummary(diffs)
-  
-  return {
-    hasChanges: diffs.length > 0,
-    totalChanges: diffs.length,
-    diffs,
-    summary
+  // Handle null/undefined cases
+  if (obj1 === null || obj1 === undefined) {
+    if (obj2 !== null && obj2 !== undefined) {
+      diffs.push({ path, type: 'added', newValue: obj2 })
+    }
+    return { hasChanges: diffs.length > 0, totalChanges: diffs.length, diffs }
   }
+  
+  if (obj2 === null || obj2 === undefined) {
+    diffs.push({ path, type: 'removed', oldValue: obj1 })
+    return { hasChanges: diffs.length > 0, totalChanges: diffs.length, diffs }
+  }
+  
+  // Handle primitive types
+  if (typeof obj1 !== 'object' || typeof obj2 !== 'object') {
+    if (obj1 !== obj2) {
+      diffs.push({ path, type: 'modified', oldValue: obj1, newValue: obj2 })
+    }
+    return { hasChanges: diffs.length > 0, totalChanges: diffs.length, diffs }
+  }
+  
+  // Handle arrays
+  if (Array.isArray(obj1) || Array.isArray(obj2)) {
+    compareArrays(obj1, obj2, path, diffs)
+    return { hasChanges: diffs.length > 0, totalChanges: diffs.length, diffs }
+  }
+  
+  // Handle objects
+  compareObjectProperties(obj1, obj2, path, diffs)
+  return { hasChanges: diffs.length > 0, totalChanges: diffs.length, diffs }
 }
 
 /**
- * Compare basic fields (id, title, description)
+ * Compare arrays by index
  */
-function compareBasicFields(payload1: ProductPayload, payload2: ProductPayload, diffs: DiffResult[]) {
-  const basicFields: (keyof ProductPayload)[] = ['id', 'title', 'description']
+function compareArrays(arr1: any[], arr2: any[], path: string, diffs: DiffResult[]) {
+  const maxLength = Math.max(arr1?.length || 0, arr2?.length || 0)
   
-  for (const field of basicFields) {
-    if (payload1[field] !== payload2[field]) {
-      diffs.push({
-        type: 'modified',
-        path: field,
-        oldValue: payload1[field],
-        newValue: payload2[field],
-        details: `Changed from "${payload1[field]}" to "${payload2[field]}"`
-      })
-    }
-  }
-}
-
-/**
- * Compare images arrays with detailed diff detection
- */
-function compareImages(images1: ProductImage[], images2: ProductImage[], diffs: DiffResult[]) {
-  const images1Map = new Map(images1.map(img => [img.id, img]))
-  const images2Map = new Map(images2.map(img => [img.id, img]))
-  
-  // Find added images
-  for (const [id, image] of images2Map) {
-    if (!images1Map.has(id)) {
-      diffs.push({
-        type: 'added',
-        path: `images[${id}]`,
-        newValue: image,
-        details: `New image added with ID ${id}`
-      })
-    }
-  }
-  
-  // Find removed images
-  for (const [id, image] of images1Map) {
-    if (!images2Map.has(id)) {
-      diffs.push({
-        type: 'removed',
-        path: `images[${id}]`,
-        oldValue: image,
-        details: `Image with ID ${id} was removed`
-      })
-    }
-  }
-  
-  // Find modified images
-  for (const [id, image1] of images1Map) {
-    const image2 = images2Map.get(id)
-    if (image2) {
-      compareImageDetails(image1, image2, diffs, id)
-    }
-  }
-  
-  // Check for position changes (images with same ID but different positions)
-  const positionChanges = findPositionChanges(images1, images2)
-  diffs.push(...positionChanges)
-}
-
-/**
- * Compare individual image details
- */
-function compareImageDetails(image1: ProductImage, image2: ProductImage, diffs: DiffResult[], id: number) {
-  if (image1.position !== image2.position) {
-    diffs.push({
-      type: 'modified',
-      path: `images[${id}].position`,
-      oldValue: image1.position,
-      newValue: image2.position,
-      details: `Image position changed from ${image1.position} to ${image2.position}`
-    })
-  }
-  
-  if (image1.url !== image2.url) {
-    diffs.push({
-      type: 'modified',
-      path: `images[${id}].url`,
-      oldValue: image1.url,
-      newValue: image2.url,
-      details: `Image URL changed from "${image1.url}" to "${image2.url}"`
-    })
-  }
-}
-
-/**
- * Find position changes in images array
- */
-function findPositionChanges(images1: ProductImage[], images2: ProductImage[]): DiffResult[] {
-  const diffs: DiffResult[] = []
-  
-  // Create maps by position
-  const pos1Map = new Map(images1.map(img => [img.position, img]))
-  const pos2Map = new Map(images2.map(img => [img.position, img]))
-  
-  // Check each position
-  for (let pos = 1; pos <= Math.max(images1.length, images2.length); pos++) {
-    const img1 = pos1Map.get(pos)
-    const img2 = pos2Map.get(pos)
+  for (let i = 0; i < maxLength; i++) {
+    const itemPath = path ? `${path}[${i}]` : `[${i}]`
+    const item1 = arr1?.[i]
+    const item2 = arr2?.[i]
     
-    if (img1 && img2 && img1.id !== img2.id) {
-      diffs.push({
-        type: 'modified',
-        path: `images[position:${pos}]`,
-        oldValue: img1,
-        newValue: img2,
-        details: `Image at position ${pos} changed from ID ${img1.id} to ID ${img2.id}`
-      })
-    }
-  }
-  
-  return diffs
-}
-
-/**
- * Compare variants arrays with detailed diff detection
- */
-function compareVariants(variants1: ProductVariant[], variants2: ProductVariant[], diffs: DiffResult[]) {
-  const variants1Map = new Map(variants1.map(v => [v.id, v]))
-  const variants2Map = new Map(variants2.map(v => [v.id, v]))
-  
-  // Find added variants
-  for (const [id, variant] of variants2Map) {
-    if (!variants1Map.has(id)) {
-      diffs.push({
-        type: 'added',
-        path: `variants[${id}]`,
-        newValue: variant,
-        details: `New variant added with ID ${id}`
-      })
-    }
-  }
-  
-  // Find removed variants
-  for (const [id, variant] of variants1Map) {
-    if (!variants2Map.has(id)) {
-      diffs.push({
-        type: 'removed',
-        path: `variants[${id}]`,
-        oldValue: variant,
-        details: `Variant with ID ${id} was removed`
-      })
-    }
-  }
-  
-  // Find modified variants
-  for (const [id, variant1] of variants1Map) {
-    const variant2 = variants2Map.get(id)
-    if (variant2) {
-      compareVariantDetails(variant1, variant2, diffs, id)
+    if (i >= (arr1?.length || 0)) {
+      diffs.push({ path: itemPath, type: 'added', newValue: item2 })
+    } else if (i >= (arr2?.length || 0)) {
+      diffs.push({ path: itemPath, type: 'removed', oldValue: item1 })
+    } else {
+      const result = compareObjects(item1, item2, itemPath)
+      diffs.push(...result.diffs)
     }
   }
 }
 
 /**
- * Compare individual variant details
+ * Compare object properties
  */
-function compareVariantDetails(variant1: ProductVariant, variant2: ProductVariant, diffs: DiffResult[], id: number) {
-  const fields: (keyof ProductVariant)[] = ['sku', 'barcode', 'image_id', 'inventory_quantity']
+function compareObjectProperties(obj1: any, obj2: any, path: string, diffs: DiffResult[]) {
+  const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)])
   
-  for (const field of fields) {
-    if (variant1[field] !== variant2[field]) {
-      diffs.push({
-        type: 'modified',
-        path: `variants[${id}].${field}`,
-        oldValue: variant1[field],
-        newValue: variant2[field],
-        details: `Variant ${field} changed from "${variant1[field]}" to "${variant2[field]}"`
-      })
-    }
-  }
-}
-
-/**
- * Calculate summary statistics from diffs
- */
-function calculateSummary(diffs: DiffResult[]) {
-  const summary = {
-    images: { added: 0, removed: 0, modified: 0 },
-    variants: { added: 0, removed: 0, modified: 0 },
-    other: { added: 0, removed: 0, modified: 0 }
-  }
-  
-  for (const diff of diffs) {
-    const category = diff.path.startsWith('images') ? 'images' : 
-                    diff.path.startsWith('variants') ? 'variants' : 'other'
+  for (const key of allKeys) {
+    const keyPath = path ? `${path}.${key}` : key
+    const value1 = obj1[key]
+    const value2 = obj2[key]
     
-    // Only count non-unchanged types
-    if (diff.type !== 'unchanged') {
-      summary[category][diff.type]++
+    // Check if key exists in both objects
+    const hasKey1 = key in obj1
+    const hasKey2 = key in obj2
+    
+    if (!hasKey1 && hasKey2) {
+      diffs.push({ path: keyPath, type: 'added', newValue: value2 })
+    } else if (hasKey1 && !hasKey2) {
+      diffs.push({ path: keyPath, type: 'removed', oldValue: value1 })
+    } else if (hasKey1 && hasKey2) {
+      const result = compareObjects(value1, value2, keyPath)
+      diffs.push(...result.diffs)
     }
   }
-  
-  return summary
 }
 
+/**
+ * Legacy function for backward compatibility
+ */
+export function comparePayloads(payload1: any, payload2: any): ComparisonResult {
+  return compareObjects(payload1, payload2)
+}

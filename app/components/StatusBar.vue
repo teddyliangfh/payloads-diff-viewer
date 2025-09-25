@@ -1,24 +1,24 @@
 <template>
-  <div class="bg-white rounded-lg border p-4 mb-6">
+  <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6 shadow-sm">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2">
-          <div :class="payload1Sent ? 'bg-green-500' : 'bg-gray-300'" class="w-3 h-3 rounded-full"></div>
-          <span class="text-sm font-medium">Payload 1</span>
+          <div :class="payload1Sent ? 'bg-green-500' : 'bg-gray-400'" class="w-3 h-3 rounded-full"></div>
+          <span class="text-sm font-medium text-gray-800">Payload 1</span>
         </div>
         <div class="flex items-center gap-2">
-          <div :class="payload2Sent ? 'bg-green-500' : 'bg-gray-300'" class="w-3 h-3 rounded-full"></div>
-          <span class="text-sm font-medium">Payload 2</span>
+          <div :class="payload2Sent ? 'bg-green-500' : 'bg-gray-400'" class="w-3 h-3 rounded-full"></div>
+          <span class="text-sm font-medium text-gray-800">Payload 2</span>
         </div>
         <div class="flex items-center gap-2">
-          <div :class="comparisonResult ? 'bg-blue-500' : 'bg-gray-300'" class="w-3 h-3 rounded-full"></div>
-          <span class="text-sm font-medium">Comparison</span>
+          <div :class="comparisonResult ? 'bg-blue-500' : 'bg-gray-400'" class="w-3 h-3 rounded-full"></div>
+          <span class="text-sm font-medium text-gray-800">Comparison</span>
         </div>
       </div>
       <button 
         @click="$emit('clear-all')"
         :disabled="loading"
-        class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50"
+        class="px-3 py-1 text-sm bg-red-100 text-red-800 border border-red-200 rounded hover:bg-red-200 disabled:opacity-50 transition-colors"
       >
         Clear All
       </button>

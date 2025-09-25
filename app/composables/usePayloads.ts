@@ -6,11 +6,13 @@
 
 // Re-export types from server for frontend use
 export type { 
-  ProductPayload as PayloadData,
   DiffResult,
   ComparisonResult,
   PayloadApiResponse as ApiResponse
 } from '../../server/types/payload.types'
+
+// Generic payload data type
+export type PayloadData = any
 
 export const usePayloads = () => {
   // State management

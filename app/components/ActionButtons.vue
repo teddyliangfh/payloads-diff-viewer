@@ -1,17 +1,17 @@
 <template>
-  <div class="bg-white rounded-lg border p-6 mb-6">
-    <h2 class="text-xl font-semibold mb-4">Send Payloads</h2>
+  <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6 shadow-sm">
+    <h2 class="text-xl font-semibold mb-4 text-gray-900">Send Payloads</h2>
     <div class="flex gap-4">
       <button 
         @click="$emit('send-payloads')"
         :disabled="loading || payload2Sent || (payload1Sent && !payload2Sent)"
-        class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium"
+        class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium transition-colors"
       >
         {{ buttonText }}
       </button>
     </div>
     
-    <div class="mt-4 text-sm text-gray-600">
+    <div class="mt-4 text-sm text-gray-700">
       <p>• Click "Send Payload" to automatically send both payloads</p>
       <p>• First payload will be sent immediately</p>
       <p>• Second payload will be sent automatically after 30 seconds</p>

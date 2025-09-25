@@ -1,8 +1,9 @@
 /**
- * TypeScript types for payload data structures
- * Generated from sample data to ensure type safety
+ * TypeScript types for generic payload comparison system
+ * Supports any data structure with configurable comparison options
  */
 
+// Legacy types for backward compatibility
 export interface ProductImage {
   id: number
   position: number
@@ -25,27 +26,22 @@ export interface ProductPayload {
   variants: ProductVariant[]
 }
 
+// Simplified comparison types
 export interface DiffResult {
-  type: 'added' | 'removed' | 'modified' | 'unchanged'
   path: string
+  type: 'added' | 'removed' | 'modified'
   oldValue?: any
   newValue?: any
-  details?: string
 }
 
 export interface ComparisonResult {
   hasChanges: boolean
   totalChanges: number
   diffs: DiffResult[]
-  summary: {
-    images: { added: number; removed: number; modified: number }
-    variants: { added: number; removed: number; modified: number }
-    other: { added: number; removed: number; modified: number }
-  }
 }
 
 export interface StoredPayload {
-  data: ProductPayload
+  data: any // Changed to any to support any payload structure
   timestamp: string
   received: boolean
 }
@@ -66,7 +62,6 @@ export interface PayloadApiResponse {
   summary?: {
     hasChanges: boolean
     totalChanges: number
-    changesByCategory: ComparisonResult['summary']
   }
   nextStep?: string
 }
@@ -77,9 +72,31 @@ export interface ValidationResult {
 }
 
 /**
- * Validate payload structure
+ * Generic payload validation - accepts any valid JSON structure
  */
 export function validatePayload(payload: any): ValidationResult {
+  const errors: string[] = []
+  
+  if (payload === null || payload === undefined) {
+    errors.push('Payload cannot be null or undefined')
+    return { isValid: false, errors }
+  }
+  
+  // Check if it's a valid JSON-serializable structure
+  try {
+    JSON.stringify(payload)
+  } catch (error) {
+    errors.push('Payload must be JSON-serializable')
+    return { isValid: false, errors }
+  }
+  
+  return { isValid: true, errors }
+}
+
+/**
+ * Legacy validation for product payloads (for backward compatibility)
+ */
+export function validateProductPayload(payload: any): ValidationResult {
   const errors: string[] = []
   
   if (!payload || typeof payload !== 'object') {

@@ -1,15 +1,19 @@
 # Payload Diff Viewer
 
-A specialized tool for comparing JSON payloads and visualizing differences. Built with Nuxt 4, Vue 3, and TypeScript.
+A **generic and extensible** tool for comparing any JSON payloads and visualizing differences. Built with Nuxt 4, Vue 3, and TypeScript.
 
 ## 🚀 Features
 
-- **JSON Payload Comparison** - Compare two JSON payloads and visualize differences
+- **Universal JSON Comparison** - Compare any JSON structure, not just specific schemas
+- **Configurable Comparison Options** - Customize comparison behavior with various strategies
+- **Multiple Array Comparison Strategies** - Compare arrays by index, ID, or custom key
+- **Custom Comparators** - Define custom comparison logic for specific fields
 - **Interactive Diff Display** - Color-coded diff visualization with detailed change tracking
 - **Real-time Processing** - Send payloads and get instant comparison results
 - **Sample Data** - Built-in sample payloads for testing and demonstration
 - **Modern UI** - Clean, responsive interface built with Tailwind CSS
 - **TypeScript** - Full type safety throughout the application
+- **Extensible Architecture** - Easy to adapt for different data structures
 
 ## 📁 Project Structure
 
@@ -108,6 +112,84 @@ pnpm typecheck       # Run TypeScript type checking
 - **Detailed Diff View** - See exactly what changed, was added, or removed
 - **Summary Statistics** - Get an overview of total changes, additions, and removals
 - **Color-coded Changes** - Green for additions, red for removals, yellow for modifications
+
+## 🔧 Generic Comparison API
+
+The new generic comparison system supports any JSON structure with configurable options:
+
+### Basic Usage
+
+```typescript
+import { compareObjects } from './server/utils/payloadComparator'
+
+// Compare any two objects
+const result = compareObjects(obj1, obj2)
+console.log(result.diffs) // Array of differences
+console.log(result.summary) // Summary statistics
+```
+
+### Advanced Options
+
+```typescript
+const result = compareObjects(obj1, obj2, {
+  arrayComparisonStrategy: 'byId', // 'byIndex' | 'byKey' | 'byId'
+  ignoreKeys: ['timestamp', 'id'], // Keys to ignore
+  maxDepth: 5, // Maximum comparison depth
+  customComparators: {
+    'price': (val1, val2) => Math.abs(val1 - val2) < 0.01 ? null : { /* diff */ }
+  }
+})
+```
+
+### Array Comparison Strategies
+
+- **`byIndex`** (default): Compare arrays by position
+- **`byId`**: Compare arrays by `id` field
+- **`byKey`**: Compare arrays by custom key field
+
+### Built-in Comparators
+
+```typescript
+import { CommonComparators } from './server/utils/payloadComparator'
+
+// Date comparison
+const dateComparator = CommonComparators.dateComparator('createdAt')
+
+// Number comparison with tolerance
+const numberComparator = CommonComparators.numberComparator('price', 0.01)
+
+// Array comparison ignoring order
+const arrayComparator = CommonComparators.unorderedArrayComparator('tags')
+```
+
+### Example: E-commerce Product Comparison
+
+```typescript
+const product1 = {
+  id: 1,
+  name: "Widget",
+  price: 9.99,
+  tags: ["electronics", "gadgets"],
+  inventory: { stock: 100, location: "warehouse-a" }
+}
+
+const product2 = {
+  id: 1,
+  name: "Widget Pro",
+  price: 9.98, // Slight price difference
+  tags: ["gadgets", "electronics"], // Same tags, different order
+  inventory: { stock: 95, location: "warehouse-b" }
+}
+
+const result = compareObjects(product1, product2, {
+  arrayComparisonStrategy: 'byId',
+  ignoreKeys: ['id'],
+  customComparators: {
+    ...CommonComparators.numberComparator('price', 0.1),
+    ...CommonComparators.unorderedArrayComparator('tags')
+  }
+})
+```
 
 ## 🧪 Testing
 

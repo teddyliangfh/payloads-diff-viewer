@@ -2,11 +2,25 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Custom CSS variables */
+/* Custom CSS variables - Material UI inspired */
 :root {
   --color-primary: theme('colors.primary.500');
   --color-primary-dark: theme('colors.primary.700');
   --color-primary-light: theme('colors.primary.300');
+  
+  /* Material UI inspired text colors for better contrast */
+  --text-primary: theme('colors.gray.900');
+  --text-secondary: theme('colors.gray.700');
+  --text-disabled: theme('colors.gray.500');
+  
+  /* Material UI inspired surface colors */
+  --surface-primary: theme('colors.white');
+  --surface-secondary: theme('colors.gray.50');
+  --surface-elevated: theme('colors.white');
+  
+  /* Material UI inspired border colors */
+  --border-primary: theme('colors.gray.200');
+  --border-secondary: theme('colors.gray.300');
 }
 
 /* Base styles */
@@ -17,17 +31,17 @@
   }
 
   body {
-    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-200;
+    @apply bg-white text-gray-900;
   }
 
   /* Focus styles */
   *:focus {
-    @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900;
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
   }
 
   /* Selection styles */
   ::selection {
-    @apply bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100;
+    @apply bg-blue-100 text-blue-900;
   }
 }
 
@@ -46,15 +60,15 @@
   }
 
   .btn-outline {
-    @apply btn border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-blue-500;
+    @apply btn border-gray-300 text-gray-800 bg-white hover:bg-gray-50 focus:ring-blue-500;
   }
 
   .input {
-    @apply block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white;
+    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900;
   }
 
   .card {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700;
+    @apply bg-white rounded-lg shadow-sm border border-gray-200;
   }
 
   .badge {
@@ -62,19 +76,19 @@
   }
 
   .badge-primary {
-    @apply badge bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300;
+    @apply badge bg-blue-100 text-blue-800;
   }
 
   .badge-success {
-    @apply badge bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300;
+    @apply badge bg-green-100 text-green-800;
   }
 
   .badge-warning {
-    @apply badge bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300;
+    @apply badge bg-yellow-100 text-yellow-800;
   }
 
   .badge-error {
-    @apply badge bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300;
+    @apply badge bg-red-100 text-red-800;
   }
 }
 
@@ -119,16 +133,4 @@
     background-color: theme('colors.gray.400');
   }
 
-  /* Dark mode scrollbar */
-  .dark .scrollbar-thin {
-    scrollbar-color: theme('colors.gray.600') transparent;
-  }
-
-  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: theme('colors.gray.600');
-  }
-
-  .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background-color: theme('colors.gray.500');
-  }
 }

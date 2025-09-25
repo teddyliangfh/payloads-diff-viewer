@@ -1,15 +1,14 @@
 /**
  * Unified API endpoint for handling payload operations
- * Supports both single payload storage and payload comparison
+ * Supports both single payload storage and generic payload comparison
  */
 import { 
   validatePayload,
-  type ProductPayload,
   type PayloadApiResponse,
   type StoredPayload,
   type StoredComparison
 } from '../../types/payload.types'
-import { comparePayloads } from '../../utils/payloadComparator'
+import { compareObjects } from '../../utils/payloadComparator'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -26,7 +25,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const payload: ProductPayload = body
+    const payload: any = body
     const storage = useStorage('payloads')
     
     // Check if this is the first payload
@@ -49,7 +48,7 @@ export default defineEventHandler(async (event) => {
         success: true,
         message: 'First payload received successfully',
         timestamp: new Date().toISOString(),
-        payloadId: payload.id,
+        payloadId: payload.id || 'unknown',
         nextStep: 'Send second payload to compare with the first one'
       }
       
@@ -64,14 +63,15 @@ export default defineEventHandler(async (event) => {
       
       await storage.setItem('payload2', storedPayload2)
       
-      // Perform comparison
-      const comparisonResult = comparePayloads(existingPayload1.data, payload)
+      // Perform comparison using generic comparator
+      const payload1Data = (existingPayload1 as StoredPayload).data
+      const comparisonResult = compareObjects(payload1Data, payload)
       
       // Store comparison result
       const storedComparison: StoredComparison = {
         result: comparisonResult,
         timestamp: new Date().toISOString(),
-        payload1Timestamp: existingPayload1.timestamp,
+        payload1Timestamp: (existingPayload1 as StoredPayload).timestamp,
         payload2Timestamp: new Date().toISOString()
       }
       
@@ -81,19 +81,18 @@ export default defineEventHandler(async (event) => {
         success: true,
         message: 'Second payload received and compared successfully',
         timestamp: new Date().toISOString(),
-        payloadId: payload.id,
+        payloadId: payload.id || 'unknown',
         comparison: comparisonResult,
         summary: {
           hasChanges: comparisonResult.hasChanges,
-          totalChanges: comparisonResult.totalChanges,
-          changesByCategory: comparisonResult.summary
+          totalChanges: comparisonResult.totalChanges
         }
       }
       
       return response
     }
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error processing payload:', error)
     
     if (error.statusCode) {
