@@ -1,5 +1,6 @@
 import { beforeEach, vi } from 'vitest'
 import '@testing-library/jest-dom'
+import { ref, readonly } from 'vue'
 
 // Mock localStorage
 const localStorageMock = {
@@ -39,6 +40,10 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }))
+
+// Make Vue composables globally available
+global.ref = ref
+global.readonly = readonly
 
 // Reset all mocks before each test
 beforeEach(() => {

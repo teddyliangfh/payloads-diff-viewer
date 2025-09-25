@@ -1,3 +1,5 @@
+import type { StoredPayload, StoredComparison } from '../../types/payload.types'
+
 /**
  * API endpoint to check the status of stored payloads
  * Returns information about what payloads are available and their timestamps
@@ -5,9 +7,9 @@
 export default defineEventHandler(async (event) => {
   try {
     // Check what payloads are stored
-    const payload1Data = await useStorage('payloads').getItem('payload1')
-    const payload2Data = await useStorage('payloads').getItem('payload2')
-    const comparisonData = await useStorage('payloads').getItem('comparison')
+    const payload1Data = await useStorage('payloads').getItem<StoredPayload>('payload1')
+    const payload2Data = await useStorage('payloads').getItem<StoredPayload>('payload2')
+    const comparisonData = await useStorage('payloads').getItem<StoredComparison>('comparison')
     
     const status = {
       payload1: payload1Data ? {
@@ -35,13 +37,13 @@ export default defineEventHandler(async (event) => {
     
     return status
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error checking payload status:', error)
     
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal server error while checking payload status',
-      data: { error: error.message }
+      data: { error: error?.message || 'Unknown error' }
     })
   }
 })

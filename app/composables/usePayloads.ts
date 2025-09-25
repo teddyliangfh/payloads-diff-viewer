@@ -147,7 +147,7 @@ export const usePayloads = () => {
     error: readonly(error),
     payload1Sent: readonly(payload1Sent),
     payload2Sent: readonly(payload2Sent),
-    comparisonResult: readonly(comparisonResult),
+    comparisonResult,
     status: readonly(status),
     
     // Methods

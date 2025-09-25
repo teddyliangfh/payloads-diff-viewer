@@ -15,13 +15,13 @@ export default defineEventHandler(async (event) => {
       timestamp: new Date().toISOString()
     }
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error clearing payload data:', error)
     
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal server error while clearing payload data',
-      data: { error: error.message }
+      data: { error: error?.message || 'Unknown error' }
     })
   }
 })
