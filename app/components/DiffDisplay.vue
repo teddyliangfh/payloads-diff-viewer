@@ -1,6 +1,6 @@
 <template>
   <div class="diff-display">
-    <div v-if="!comparisonResult" class="no-data">
+    <div v-if="!props.comparisonResult" class="no-data">
       <p class="text-gray-700">No comparison data available</p>
     </div>
     
@@ -9,7 +9,7 @@
       <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
         <h3 class="text-lg font-semibold mb-4 text-gray-900">Comparison Summary</h3>
         <div class="text-center">
-          <div class="text-3xl font-bold text-blue-700">{{ comparisonResult.totalChanges }}</div>
+          <div class="text-3xl font-bold text-blue-700">{{ props.comparisonResult.totalChanges }}</div>
           <div class="text-sm text-gray-700">Total Changes</div>
         </div>
       </div>
@@ -21,7 +21,7 @@
         </div>
         <div class="divide-y divide-gray-200">
           <div 
-            v-for="(diff, index) in comparisonResult.diffs" 
+            v-for="(diff, index) in props.comparisonResult.diffs" 
             :key="index"
             class="p-4 hover:bg-gray-50 transition-colors"
           >
@@ -76,7 +76,8 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const getTypeBadgeClass = (type: DiffResult['type']) => {
+
+const getTypeBadgeClass = (type: DiffResult['type']): string => {
   switch (type) {
     case 'added':
       return 'bg-green-100 text-green-800 border border-green-200'
@@ -89,11 +90,8 @@ const getTypeBadgeClass = (type: DiffResult['type']) => {
   }
 }
 
-const formatValue = (value: any): string => {
-  if (typeof value === 'string' && value.length > 100) {
-    return value.substring(0, 100) + '...'
-  }
-  if (typeof value === 'object') {
+const formatValue = (value: unknown): string => {
+  if (typeof value === 'object' && value !== null) {
     return JSON.stringify(value, null, 2)
   }
   return String(value)
