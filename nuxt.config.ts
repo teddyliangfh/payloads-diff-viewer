@@ -10,7 +10,13 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   // Modules
-  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', '@vueuse/nuxt', '@nuxtjs/color-mode'],
+  modules: ['@nuxtjs/tailwindcss', '@vueuse/nuxt'],
+
+  // Development server configuration
+  devServer: {
+    port: 3000,
+    host: 'localhost'
+  },
 
   // Runtime config
   runtimeConfig: {
@@ -20,7 +26,7 @@ export default defineNuxtConfig({
     // Public keys (exposed to client-side)
     public: {
       apiBase: process.env.API_BASE || '/api',
-      appName: process.env.APP_NAME || 'Nuxt4 Vibe Template',
+      appName: process.env.APP_NAME || 'Payload Diff Viewer',
       appVersion: process.env.APP_VERSION || '1.0.0',
     },
   },
@@ -28,11 +34,11 @@ export default defineNuxtConfig({
   // App configuration
   app: {
     head: {
-      title: 'Nuxt4 Vibe Template',
+      title: 'Payload Diff Viewer',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'A modern Nuxt 4 template with Cursor vibe coding setup' },
+        { name: 'description', content: 'Compare JSON payloads and visualize differences' },
         { name: 'format-detection', content: 'telephone=no' },
       ],
       link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
@@ -57,17 +63,6 @@ export default defineNuxtConfig({
     transpile: [],
   },
 
-  // Color mode configuration
-  colorMode: {
-    classSuffix: '',
-    preference: 'system',
-    fallback: 'light',
-    hid: 'nuxt-color-mode-script',
-    globalName: '__NUXT_COLOR_MODE__',
-    componentName: 'ColorScheme',
-    classPrefix: '',
-    storageKey: 'nuxt-color-mode',
-  },
 
   // Tailwind CSS configuration
   tailwindcss: {

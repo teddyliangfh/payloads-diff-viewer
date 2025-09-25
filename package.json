@@ -1,7 +1,7 @@
 {
-  "name": "nuxt4-vibe-coding-template",
-  "version": "1.0.1",
-  "description": "A modern Nuxt 4 template with Cursor vibe coding setup and Vitest testing",
+  "name": "payloads-diff-viewer",
+  "version": "1.0.0",
+  "description": "A specialized tool for comparing JSON payloads and visualizing differences",
   "private": true,
   "type": "module",
   "scripts": {
@@ -25,13 +25,10 @@
     "typecheck:watch": "tsc --noEmit --watch"
   },
   "dependencies": {
-    "@nuxtjs/color-mode": "^3.5.1",
     "@nuxtjs/tailwindcss": "^6.12.2",
-    "@pinia/nuxt": "^0.5.5",
     "@vueuse/core": "^11.1.0",
     "@vueuse/nuxt": "^11.1.0",
     "nuxt": "^4.1.2",
-    "pinia": "^2.2.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
@@ -58,14 +55,14 @@
     "node": ">=22.0.0"
   },
   "keywords": [
+    "payload",
+    "diff",
+    "comparison",
+    "json",
+    "webhook",
     "nuxt4",
     "vue3",
-    "typescript",
-    "tailwindcss",
-    "vitest",
-    "cursor",
-    "template",
-    "boilerplate"
+    "typescript"
   ],
   "author": "Your Name",
   "license": "MIT"

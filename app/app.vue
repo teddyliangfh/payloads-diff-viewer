@@ -8,7 +8,7 @@
     <DevOnly>
       <div class="fixed bottom-4 right-4 z-50">
         <div class="bg-black/80 text-white px-3 py-2 rounded-lg text-sm font-mono">
-          Nuxt 4 + Cursor Vibe
+          Payload Diff Viewer
         </div>
       </div>
     </DevOnly>
@@ -34,15 +34,11 @@ onErrorCaptured((error, instance, info) => {
 /* Global styles */
 html {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  scroll-behavior: smooth;
 }
 
 body {
   @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-200;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
 }
 
 /* Focus styles */

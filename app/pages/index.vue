@@ -1,121 +1,232 @@
 <template>
-  <div class="py-16 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
-      <!-- Hero section -->
-      <div class="text-center">
-        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-          Welcome to
-          <span class="text-blue-600 dark:text-blue-400">Nuxt 4</span>
-          <br />
-          Vibe Template
-        </h1>
-
-        <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-          A modern, production-ready template featuring Nuxt 4, TypeScript, Tailwind CSS,
-          Vitest testing, and Cursor vibe coding setup.
-        </p>
-
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <NuxtLink to="/demo"
-            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors">
-            View Demo
-            <Icon name="heroicons:arrow-right" class="ml-2 w-4 h-4" />
-          </NuxtLink>
-
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer"
-            class="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-            <Icon name="heroicons:code-bracket" class="mr-2 w-4 h-4" />
-            View Source
-          </a>
-        </div>
+  <div class="min-h-screen bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Payload Diff Viewer</h1>
+        <p class="text-gray-600">Compare JSON payloads and visualize differences</p>
       </div>
 
-      <!-- Features grid -->
-      <div class="mt-20">
-        <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-          What's Included
-        </h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <FeatureCard title="Nuxt 4"
-            description="Latest Nuxt framework with enhanced performance and developer experience"
-            icon="heroicons:bolt" />
-
-          <FeatureCard title="TypeScript"
-            description="Full TypeScript support with strict type checking and enhanced IntelliSense"
-            icon="heroicons:code-bracket" />
-
-          <FeatureCard title="Tailwind CSS"
-            description="Utility-first CSS framework with dark mode support and responsive design"
-            icon="heroicons:paint-brush" />
-
-          <FeatureCard title="Vitest Testing"
-            description="Fast unit testing with Vitest, including coverage reports and UI" icon="heroicons:beaker" />
-
-          <FeatureCard title="Cursor Vibe"
-            description="Optimized for Cursor AI coding with proper rules and configurations"
-            icon="heroicons:sparkles" />
-
-        </div>
-      </div>
-
-      <!-- Tech stack -->
-      <div class="mt-20">
-        <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
-          Tech Stack
-        </h2>
-
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <TechBadge name="Nuxt 4" color="green" />
-            <TechBadge name="Vue 3" color="green" />
-            <TechBadge name="TypeScript" color="blue" />
-            <TechBadge name="Tailwind" color="cyan" />
-            <TechBadge name="Vitest" color="yellow" />
-            <TechBadge name="Pinia" color="yellow" />
-            <TechBadge name="VueUse" color="purple" />
+      <!-- Status Bar -->
+      <div class="bg-white rounded-lg border p-4 mb-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <div :class="payload1Sent ? 'bg-green-500' : 'bg-gray-300'" class="w-3 h-3 rounded-full"></div>
+              <span class="text-sm font-medium">Payload 1</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div :class="payload2Sent ? 'bg-green-500' : 'bg-gray-300'" class="w-3 h-3 rounded-full"></div>
+              <span class="text-sm font-medium">Payload 2</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div :class="comparisonResult ? 'bg-blue-500' : 'bg-gray-300'" class="w-3 h-3 rounded-full"></div>
+              <span class="text-sm font-medium">Comparison</span>
+            </div>
           </div>
+          <button 
+            @click="clearAllData"
+            :disabled="loading"
+            class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50"
+          >
+            Clear All
+          </button>
         </div>
       </div>
 
-      <!-- Getting started -->
-      <div class="mt-20">
-        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
-          <h2 class="text-3xl font-bold mb-4">Ready to Start Building?</h2>
-          <p class="text-blue-100 mb-6">
-            This template is ready to use. Start coding your next project with modern tools and best practices.
-          </p>
-
-          <div class="bg-black/20 rounded-lg p-4 font-mono text-sm">
-            <div class="text-green-400"># Install dependencies</div>
-            <div class="text-white">npm install</div>
-            <div class="text-green-400 mt-2"># Start development server</div>
-            <div class="text-white">npm run dev</div>
-          </div>
+      <!-- Error Display -->
+      <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center gap-2">
+          <div class="text-red-500">⚠️</div>
+          <span class="text-red-700">{{ error }}</span>
         </div>
       </div>
+
+      <!-- Action Buttons -->
+      <div class="bg-white rounded-lg border p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Send Payloads</h2>
+        <div class="flex gap-4">
+          <button 
+            @click="sendPayloads"
+            :disabled="loading || payload2Sent || (payload1Sent && !payload2Sent)"
+            class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium"
+          >
+            {{ getButtonText() }}
+          </button>
+        </div>
+        
+        <div class="mt-4 text-sm text-gray-600">
+          <p>• Click "Send Payload" to automatically send both payloads</p>
+          <p>• First payload will be sent immediately</p>
+          <p>• Second payload will be sent automatically after 30 seconds</p>
+          <p>• Comparison results will appear after both payloads are processed</p>
+        </div>
+      </div>
+
+      <!-- Loading Indicator -->
+      <div v-if="loading" class="bg-white rounded-lg border p-6 mb-6">
+        <div class="flex items-center justify-center">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span class="ml-3 text-gray-600">{{ getLoadingMessage() }}</span>
+        </div>
+      </div>
+
+      <!-- Success Messages -->
+      <div v-if="payload1Sent && !payload2Sent && !loading" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center gap-2">
+          <div class="text-blue-500">📤</div>
+          <span class="text-blue-700">First payload sent successfully! Second payload will be sent automatically in {{ countdown }} seconds...</span>
+        </div>
+      </div>
+
+      <div v-if="payload2Sent && !comparisonResult && !loading" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center gap-2">
+          <div class="text-yellow-500">⏳</div>
+          <span class="text-yellow-700">Both payloads sent successfully! Comparison results will be displayed soon...</span>
+        </div>
+      </div>
+
+      <div v-if="payload2Sent && comparisonResult && !loading" class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center gap-2">
+          <div class="text-green-500">✅</div>
+          <span class="text-green-700">Comparison completed successfully! Found {{ comparisonResult.totalChanges }} differences.</span>
+        </div>
+      </div>
+
+      <!-- Diff Display -->
+      <DiffDisplay :comparison-result="comparisonResult" />
     </div>
   </div>
 </template>
 
-<script setup>
-// Page metadata
-useHead({
-  title: 'Home - Nuxt4 Vibe Template',
-  meta: [
-    { name: 'description', content: 'A modern Nuxt 4 template with Cursor vibe coding setup' },
-  ],
+<script setup lang="ts">
+import type { PayloadData } from '~/composables/usePayloads'
+
+// Use the payloads composable
+const { 
+  loading, 
+  error, 
+  payload1Sent, 
+  payload2Sent, 
+  comparisonResult,
+  sendPayload1,
+  sendPayload2,
+  clearData,
+  loadSamplePayloads
+} = usePayloads()
+
+// Sample payloads
+let samplePayloads: { payload1: PayloadData; payload2: PayloadData } | null = null
+
+// Countdown timer for second payload
+const countdown = ref(30)
+let countdownInterval: NodeJS.Timeout | null = null
+
+// Load sample payloads on component mount
+onMounted(async () => {
+  try {
+    samplePayloads = await loadSamplePayloads()
+  } catch (err) {
+    console.error('Failed to load sample payloads:', err)
+  }
 })
 
-// SEO
-useSeoMeta({
-  title: 'Nuxt4 Vibe Template - Modern Development Setup',
-  ogTitle: 'Nuxt4 Vibe Template - Modern Development Setup',
-  description:
-    'A modern, production-ready template featuring Nuxt 4, TypeScript, Tailwind CSS, Vitest testing, and Cursor vibe coding setup.',
-  ogDescription:
-    'A modern, production-ready template featuring Nuxt 4, TypeScript, Tailwind CSS, Vitest testing, and Cursor vibe coding setup.',
-  ogImage: '/og-image.jpg',
-  twitterCard: 'summary_large_image',
+// Clean up interval on unmount
+onUnmounted(() => {
+  if (countdownInterval) {
+    clearInterval(countdownInterval)
+  }
+})
+
+// Send both payloads with automatic 30-second delay
+const sendPayloads = async () => {
+  if (!samplePayloads) {
+    error.value = 'Sample payloads not loaded'
+    return
+  }
+  
+  try {
+    // Send first payload
+    await sendPayload1(samplePayloads.payload1)
+    
+    // Start countdown for second payload
+    countdown.value = 30
+    countdownInterval = setInterval(() => {
+      countdown.value--
+      if (countdown.value <= 0) {
+        clearInterval(countdownInterval!)
+        countdownInterval = null
+        // Send second payload automatically
+        sendPayload2(samplePayloads!.payload2).catch(err => {
+          console.error('Failed to send payload 2:', err)
+        })
+      }
+    }, 1000)
+    
+  } catch (err) {
+    console.error('Failed to send payloads:', err)
+    if (countdownInterval) {
+      clearInterval(countdownInterval)
+      countdownInterval = null
+    }
+  }
+}
+
+// Get button text based on current state
+const getButtonText = () => {
+  if (loading.value) {
+    if (!payload1Sent.value) {
+      return 'Sending First Payload...'
+    } else if (!payload2Sent.value) {
+      return 'Waiting for Second Payload...'
+    } else {
+      return 'Processing...'
+    }
+  }
+  
+  if (payload2Sent.value) {
+    return 'Comparison Complete'
+  }
+  
+  if (payload1Sent.value && !payload2Sent.value) {
+    return `Waiting... (${countdown.value}s)`
+  }
+  
+  return 'Send Payload'
+}
+
+// Get loading message based on current state
+const getLoadingMessage = () => {
+  if (!payload1Sent.value) {
+    return 'Sending first payload...'
+  } else if (!payload2Sent.value) {
+    return 'Waiting for second payload to be sent automatically...'
+  } else {
+    return 'Processing comparison results...'
+  }
+}
+
+// Clear all data
+const clearAllData = async () => {
+  try {
+    // Clear countdown interval
+    if (countdownInterval) {
+      clearInterval(countdownInterval)
+      countdownInterval = null
+    }
+    countdown.value = 30
+    
+    await clearData()
+  } catch (err) {
+    console.error('Failed to clear data:', err)
+  }
+}
+
+// Page metadata
+useHead({
+  title: 'Payload Diff Viewer',
+  meta: [
+    { name: 'description', content: 'Compare JSON payloads and visualize differences' },
+  ],
 })
 </script>
