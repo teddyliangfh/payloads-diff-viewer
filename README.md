@@ -26,8 +26,7 @@ payloads-diff-viewer/
 │   └── app.vue                  # Root component
 ├── server/                       # Server-side code
 │   ├── api/payloads/            # Payload-related API endpoints
-│   │   ├── payload.post.ts      # Send payload endpoint
-│   │   ├── comparison.get.ts    # Get comparison results
+│   │   ├── payload.post.ts      # Send payload endpoint (handles comparison automatically)
 │   │   ├── status.get.ts        # Get payload status
 │   │   └── clear.post.ts        # Clear payload data
 │   ├── types/                   # Type definitions
@@ -129,8 +128,7 @@ pnpm test
 
 The application provides several API endpoints for payload management:
 
-- `POST /api/payloads/payload` - Send a payload for comparison
-- `GET /api/payloads/comparison` - Get comparison results
+- `POST /api/payloads/payload` - Send a payload for comparison (automatically compares when second payload is sent)
 - `GET /api/payloads/status` - Get current payload status
 - `POST /api/payloads/clear` - Clear all payload data
 

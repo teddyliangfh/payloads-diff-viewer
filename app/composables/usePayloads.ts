@@ -1,6 +1,7 @@
 /**
  * Composable for handling payload operations
  * Provides reactive state and methods for sending payloads and managing comparison results
+ * Uses useLazyAsyncData for better async data handling
  */
 
 // Re-export types from server for frontend use
@@ -12,16 +13,32 @@ export type {
 } from '../../server/types/payload.types'
 
 export const usePayloads = () => {
-  const loading = ref(false)
-  const error = ref<string | null>(null)
+  // State management
   const payload1Sent = ref(false)
   const payload2Sent = ref(false)
   const comparisonResult = ref<ComparisonResult | null>(null)
   const status = ref<any>(null)
 
+  // Load sample payloads method
+  const loadSamplePayloads = async (): Promise<{ payload1: PayloadData; payload2: PayloadData }> => {
+    try {
+      const [payload1, payload2] = await Promise.all([
+        $fetch<PayloadData>('/data/sample-payload1.json'),
+        $fetch<PayloadData>('/data/sample-payload2.json')
+      ])
+      return { payload1, payload2 }
+    } catch (err: any) {
+      error.value = err.message || 'Failed to load sample payloads'
+      throw err
+    }
+  }
+
+  // Simple loading and error state management
+  const loading = ref(false)
+  const error = ref<string | null>(null)
+
   /**
-   * Send payload to the server (unified endpoint)
-   * Automatically handles first payload storage or second payload comparison
+   * Send payload to server
    */
   const sendPayload = async (payload: PayloadData) => {
     loading.value = true
@@ -74,26 +91,16 @@ export const usePayloads = () => {
    * Send second payload (alias for backward compatibility)
    */
   const sendPayload2 = async (payload: PayloadData) => {
-    const response = await sendPayload(payload)
-    
-    // If second payload was sent but comparison not in response, fetch it
-    if (response.success && payload2Sent.value && !comparisonResult.value) {
-      try {
-        // Fetch comparison without setting loading state
-        const comparisonResponse = await $fetch<{ comparison: ComparisonResult }>('/api/payloads/comparison')
-        comparisonResult.value = comparisonResponse.comparison
-      } catch (err) {
-        console.warn('Failed to fetch comparison result:', err)
-      }
-    }
-    
-    return response
+    return sendPayload(payload)
   }
 
   /**
    * Get current status of payloads
    */
   const getStatus = async () => {
+    loading.value = true
+    error.value = null
+    
     try {
       const response = await $fetch('/api/payloads/status')
       status.value = response
@@ -101,27 +108,11 @@ export const usePayloads = () => {
     } catch (err: any) {
       error.value = err.message || 'Failed to get status'
       throw err
-    }
-  }
-
-  /**
-   * Get detailed comparison result
-   */
-  const getComparison = async () => {
-    loading.value = true
-    error.value = null
-    
-    try {
-      const response = await $fetch<{ comparison: ComparisonResult }>('/api/payloads/comparison')
-      comparisonResult.value = response.comparison
-      return response
-    } catch (err: any) {
-      error.value = err.message || 'Failed to get comparison'
-      throw err
     } finally {
       loading.value = false
     }
   }
+
 
   /**
    * Clear all stored data
@@ -131,40 +122,20 @@ export const usePayloads = () => {
     error.value = null
     
     try {
-      const response = await $fetch<ApiResponse>('/api/payloads/clear', {
-        method: 'POST'
-      })
+      const response = await $fetch('/api/payloads/clear', { method: 'POST' })
       
-      if (response.success) {
+      if (response && 'success' in response && (response as any).success) {
         payload1Sent.value = false
         payload2Sent.value = false
         comparisonResult.value = null
         status.value = null
-        return response
-      } else {
-        throw new Error(response.message || 'Failed to clear data')
       }
+      return response
     } catch (err: any) {
       error.value = err.message || 'Failed to clear data'
       throw err
     } finally {
       loading.value = false
-    }
-  }
-
-  /**
-   * Load sample payloads from server data
-   */
-  const loadSamplePayloads = async () => {
-    try {
-      const [payload1, payload2] = await Promise.all([
-        $fetch<PayloadData>('/data/sample-payload1.json'),
-        $fetch<PayloadData>('/data/sample-payload2.json')
-      ])
-      return { payload1, payload2 }
-    } catch (err: any) {
-      error.value = err.message || 'Failed to load sample payloads'
-      throw err
     }
   }
 
@@ -182,7 +153,6 @@ export const usePayloads = () => {
     sendPayload1, // Backward compatibility
     sendPayload2, // Backward compatibility
     getStatus,
-    getComparison,
     clearData,
     loadSamplePayloads
   }
