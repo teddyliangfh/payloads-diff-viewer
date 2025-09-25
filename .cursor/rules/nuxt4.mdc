@@ -1,0 +1,302 @@
+---
+description: This rule provides comprehensive best practices and coding standards for Nuxt 4 projects, covering the new project structure, improved data fetching, enhanced composables, and updated conventions. It aims to ensure maintainable, scalable, and secure Nuxt 4 applications.
+globs: *.vue,*.js,*.ts,*.mjs,*.mts,*.jsx,*.tsx,*.config.js,*.config.ts
+alwaysApply: false
+---
+
+# Nuxt 4 Best Practices and Coding Standards
+
+This rule provides comprehensive best practices and coding standards for Nuxt 4 projects, covering the new project structure, improved data fetching, enhanced composables, and updated conventions. It aims to ensure maintainable, scalable, and secure Nuxt 4 applications.
+
+## Core Principles
+
+- **Adopt Nuxt 4 New Structure:** Leverage the new `app/` directory structure for better organization and clearer separation of concerns.
+- **Convention over Configuration:** Adhere to Nuxt 4 conventions to simplify development and collaboration. Avoid deviating from conventions unless absolutely necessary.
+- **Enhanced Data Fetching:** Utilize improved `useAsyncData` and `useFetch` composables with better caching and cleanup mechanisms.
+- **Modern Composables:** Take advantage of enhanced composables and auto-imports for better developer experience.
+- **Performance First:** Implement performance optimizations from the start using Nuxt 4's enhanced features.
+- **Type Safety:** Leverage improved TypeScript support and type inference throughout the application.
+- **Embrace Testing:** Write comprehensive tests using Nuxt 4's enhanced testing capabilities with Vitest and Nuxt Test Utils.
+
+## 1. Nuxt 4 Specifics
+
+### 1.1 New Project Structure
+- **App Directory:** Code now lives in the `app/` directory by default, providing clearer organization
+- **Enhanced Directory Structure:**
+  ```
+  app/
+    assets/
+    components/
+    composables/
+    layouts/
+    middleware/
+    pages/
+    plugins/
+    utils/
+    app.config.ts
+    app.vue
+    router.options.ts
+  content/
+  layers/
+  modules/
+  public/
+  shared/
+  server/
+    api/
+    middleware/
+    plugins/
+    routes/
+    utils/
+  ```
+- **TypeScript Configuration:** Use project references in `tsconfig.json` for better type checking:
+  ```json
+  {
+    "files": [],
+    "references": [
+      { "path": "./.nuxt/tsconfig.app.json" },
+      { "path": "./.nuxt/tsconfig.server.json" },
+      { "path": "./.nuxt/tsconfig.shared.json" },
+      { "path": "./.nuxt/tsconfig.node.json" }
+    ]
+  }
+  ```
+
+### 1.2 Enhanced Auto-imports
+- Nuxt 4 provides enhanced auto-imports for all Vue 3 Composition API functions
+- No need to manually import `ref`, `computed`, `useState`, `useRouter`, etc.
+- Enhanced composable auto-importing with better tree-shaking
+- Use `useColorMode()` for color mode handling with built-in `@nuxtjs/color-mode`
+- Leverage VueUse functions for enhanced reactivity and performance
+
+### 1.3 Server API Enhancements
+- Use the Server API (within the `server/api` directory) for server-side operations
+- Enhanced Nitro integration for better performance and flexibility
+- Use `useRuntimeConfig` for runtime configuration management
+- Improved server-side composables and utilities
+
+## 2. Enhanced Data Fetching
+
+### 2.1 Improved useFetch and useAsyncData
+- **Better Caching:** Enhanced caching mechanisms with automatic cleanup
+- **Smart Deduplication:** Automatic request deduplication for better performance
+- **Enhanced Error Handling:** Improved error states and recovery mechanisms
+- **Granular Control:** Better control over server vs client-side fetching
+
+```typescript
+// Enhanced useFetch with better caching
+const { data, status, error, refresh, clear } = await useFetch('/api/data', {
+  key: 'unique-key', // Better key management
+  lazy: true, // Non-blocking navigation
+  server: false, // Client-only fetching when needed
+  transform: (data) => data.map(item => ({ ...item, processed: true })), // Enhanced transformation
+  pick: ['id', 'title'], // Better payload optimization
+  watch: [reactiveSource], // Enhanced reactivity
+  getCachedData: (key, nuxtApp, ctx) => {
+    // Custom caching logic
+    return nuxtApp.isHydrating ? nuxtApp.payload.data[key] : nuxtApp.static.data[key]
+  }
+})
+```
+
+### 2.2 Data Fetching Best Practices
+- **Use useFetch for simple API calls:** Prefer `useFetch` for straightforward data fetching
+- **Use useAsyncData for complex logic:** When combining multiple API calls or custom caching
+- **Set lazy: true for non-critical data:** Defer non-critical data fetching until after initial render
+- **Use server: false for client-only data:** Bypass SSR for data not needed on initial render
+- **Implement proper keying:** Use descriptive keys for better cache management
+- **Leverage transform and pick:** Optimize payload size and shape data appropriately
+
+### 2.3 Enhanced Composable Patterns
+```typescript
+// Custom composable with enhanced error handling
+export const useApiData = <T>(url: string, options?: UseFetchOptions<T>) => {
+  return useFetch<T>(url, {
+    ...options,
+    onRequest({ request, options }) {
+      // Enhanced request logging
+      console.log('Making request to:', request)
+    },
+    onResponse({ response }) {
+      // Enhanced response handling
+      console.log('Response received:', response.status)
+    },
+    onRequestError({ request, error }) {
+      // Enhanced error handling
+      console.error('Request error:', error)
+    }
+  })
+}
+```
+
+## 3. Code Organization and Structure
+
+### 3.1 Directory Structure Best Practices
+- **App Directory:** Place all application code in the `app/` directory
+- **Shared Directory:** Use `shared/` for code used by both client and server
+- **Layers:** Leverage Nuxt layers for modular architecture and code sharing
+- **Modules:** Use the `modules/` directory for custom Nuxt modules
+
+### 3.2 File Naming Conventions
+- **Components:** `PascalCase.vue` (e.g., `MyComponent.vue`)
+- **Composables:** `usePascalCase.ts` (e.g., `useCounter.ts`)
+- **Layouts:** `kebab-case.vue` (e.g., `default.vue`, `custom-layout.vue`)
+- **Pages:** `kebab-case.vue` (e.g., `index.vue`, `product-details.vue`)
+- **Plugins:** `kebab-case.ts` (e.g., `analytics.ts`)
+- **Stores:** `kebab-case.ts` (e.g., `user-store.ts`)
+- **Utilities:** `camelCase.ts` (e.g., `formatDate.ts`)
+
+### 3.3 Enhanced Component Architecture
+- **Composition API:** Use the Composition API for all component logic
+- **Single File Components:** Prefer `<script setup>` syntax for better developer experience
+- **Reusable Components:** Design components for maximum reusability and testability
+- **Slot Composition:** Use slots for flexible component composition
+- **Props Destructuring:** Leverage Vue 3's props destructuring when enabled
+
+```vue
+<script setup lang="ts">
+// Enhanced props destructuring (when enabled in config)
+interface Props {
+  title: string
+  description?: string
+}
+
+const { title, description = 'Default description' } = defineProps<Props>()
+
+// Enhanced composable usage
+const { data, pending, error } = await useFetch('/api/data')
+</script>
+```
+
+## 4. Enhanced Performance Considerations
+
+### 4.1 Optimization Techniques
+- **Enhanced Lazy Loading:** Improved lazy loading for images, components, and routes
+- **Better Code Splitting:** Enhanced route-based and component-based code splitting
+- **Improved Tree Shaking:** Better dead code elimination during build
+- **Enhanced Caching:** Improved API response caching and static asset caching
+- **Image Optimization:** Use `<NuxtImage>` or `<NuxtPicture>` with enhanced optimization
+
+### 4.2 Memory Management
+- **Automatic Cleanup:** Enhanced automatic cleanup of composables and resources
+- **Weak References:** Use weak references for DOM elements when possible
+- **Minimal Object Creation:** Avoid creating unnecessary objects and arrays
+- **Enhanced Garbage Collection:** Better memory management in production builds
+
+### 4.3 Rendering Optimization
+- **Enhanced Virtualization:** Improved virtualization for large lists
+- **Better Memoization:** Enhanced computed properties and memoization
+- **Improved Debouncing:** Better debouncing and throttling for event handlers
+- **Enhanced SSR:** Improved server-side rendering performance
+
+## 5. Security Best Practices
+
+### 5.1 Enhanced Security Features
+- **Improved XSS Protection:** Enhanced protection against Cross-Site Scripting
+- **Better CSRF Protection:** Improved Cross-Site Request Forgery protection
+- **Enhanced Input Validation:** Better server-side and client-side validation
+- **Improved Authentication:** Enhanced authentication and authorization patterns
+- **Better Data Protection:** Improved encryption and data masking strategies
+
+### 5.2 Secure API Communication
+- **HTTPS Enforcement:** Always use HTTPS for API communication
+- **Enhanced Rate Limiting:** Better API rate limiting implementation
+- **Improved Authentication:** Enhanced authentication for all API endpoints
+- **Better Error Handling:** Secure error messages without sensitive data exposure
+
+## 6. Testing Approaches
+
+### 6.1 Enhanced Testing Setup
+- **Vitest Integration:** Use Vitest with enhanced Nuxt Test Utils integration
+- **Multi-Project Testing:** Configure multiple test projects for different environments
+- **Enhanced Mocking:** Better mocking capabilities for external dependencies
+- **Improved E2E Testing:** Enhanced end-to-end testing with Playwright integration
+
+```typescript
+// Enhanced Vitest configuration for Nuxt 4
+import { defineConfig } from 'vitest/config'
+import { defineVitestProject } from '@nuxt/test-utils/config'
+
+export default defineConfig({
+  test: {
+    projects: [
+      {
+        test: {
+          name: 'unit',
+          include: ['test/{e2e,unit}/*.{test,spec}.ts'],
+          environment: 'node',
+        },
+      },
+      await defineVitestProject({
+        test: {
+          name: 'nuxt',
+          include: ['test/nuxt/*.{test,spec}.ts'],
+          environment: 'nuxt',
+        },
+      }),
+    ],
+  },
+})
+```
+
+### 6.2 Testing Best Practices
+- **Component Testing:** Test individual components with enhanced Vue Test Utils
+- **Integration Testing:** Test component interactions and data flow
+- **API Testing:** Test server API routes and endpoints
+- **E2E Testing:** Use Playwright for comprehensive end-to-end testing
+- **Mocking Strategy:** Use enhanced mocking for external dependencies
+
+## 7. Enhanced Development Workflow
+
+### 7.1 Development Tools
+- **Enhanced TypeScript:** Better TypeScript support with improved type inference
+- **Improved Hot Module Replacement:** Faster development with enhanced HMR
+- **Better Debugging:** Enhanced debugging capabilities with Vue DevTools integration
+- **Improved Error Reporting:** Better error messages and stack traces
+
+### 7.2 Build Configuration
+- **Enhanced Vite Integration:** Better Vite integration for faster builds
+- **Improved Bundle Analysis:** Better bundle size analysis and optimization
+- **Enhanced Deployment:** Improved deployment strategies and optimization
+- **Better CI/CD Integration:** Enhanced continuous integration and deployment
+
+### 7.3 Code Quality
+- **Enhanced ESLint:** Better ESLint integration with Nuxt 4 specific rules
+- **Improved Prettier:** Better code formatting with enhanced Prettier integration
+- **Better Git Hooks:** Enhanced pre-commit hooks for code quality
+- **Improved Documentation:** Better JSDoc support and documentation generation
+
+## 8. Migration and Upgrade Considerations
+
+### 8.1 From Nuxt 3 to Nuxt 4
+- **Directory Structure:** Migrate to new `app/` directory structure
+- **Enhanced Composables:** Update to use enhanced composable APIs
+- **Improved Data Fetching:** Migrate to enhanced data fetching patterns
+- **Better TypeScript:** Update TypeScript configuration for improved type checking
+
+### 8.2 Breaking Changes
+- **SPA Loading:** Updated SPA loading screen DOM structure
+- **Module Loading:** Corrected module loading order with layers
+- **TypeScript Configuration:** Updated TypeScript project references
+- **Build Scripts:** Updated build and preview scripts for server targets
+
+## 9. Best Practices Summary
+
+### 9.1 Essential Guidelines
+- **Use the new app directory structure** for better organization
+- **Leverage enhanced data fetching** with improved caching and error handling
+- **Implement proper TypeScript configuration** with project references
+- **Use enhanced composables** for better developer experience
+- **Follow performance best practices** from the start
+- **Implement comprehensive testing** with enhanced testing tools
+- **Maintain security best practices** throughout development
+- **Use modern development tools** and workflows
+
+### 9.2 Anti-patterns to Avoid
+- **Avoid ignoring the new directory structure** - migrate to `app/` directory
+- **Don't use deprecated data fetching patterns** - use enhanced `useFetch`/`useAsyncData`
+- **Avoid poor TypeScript configuration** - use project references
+- **Don't ignore performance optimizations** - implement from the start
+- **Avoid inadequate testing** - use comprehensive testing strategies
+- **Don't compromise on security** - implement security best practices
+
+By following these Nuxt 4 best practices, you can build robust, maintainable, and scalable applications that leverage the full power of Nuxt 4's enhanced features and improved developer experience.

@@ -1,0 +1,231 @@
+# Cursor Vibe Coding Rules for Nuxt 4 Template
+
+This document provides specific rules and configurations for optimal Cursor AI coding experience with this Nuxt 4 template.
+
+## Project Context
+
+This is a modern Nuxt 4 template with the following tech stack:
+- **Frontend**: Nuxt 4, Vue 3, TypeScript, Tailwind CSS
+- **Testing**: Vitest, @nuxt/test-utils
+- **State Management**: Pinia
+- **Utilities**: VueUse, @vueuse/nuxt
+- **Styling**: Tailwind CSS with dark mode support
+- **Package Manager**: pnpm (recommended for speed and efficiency)
+- **Code Quality**: Biome v2 (ultra-fast linting and formatting in Rust)
+- **Development**: TypeScript strict mode
+
+## Code Style Guidelines
+
+### Vue Components
+- Use `<script setup>` syntax for all components
+- Prefer Composition API over Options API
+- Use TypeScript interfaces for props and emits
+- Implement proper error boundaries with `onErrorCaptured`
+- Use semantic HTML elements with proper accessibility attributes
+
+### TypeScript
+- Enable strict mode with all strict flags
+- Use proper type annotations for all functions and variables
+- Leverage Nuxt 4's enhanced auto-imports
+- Use generic types for reusable composables
+- Implement proper error handling with typed error objects
+
+### Styling
+- Use Tailwind CSS utility classes
+- Implement responsive design with mobile-first approach
+- Support dark mode with proper color schemes
+- Use CSS custom properties for theme customization
+- Follow BEM-like naming for custom CSS classes
+
+### File Organization
+- Follow Nuxt 4's new app directory structure
+- Place components in `app/components/`
+- Place composables in `app/composables/`
+- Place pages in `app/pages/`
+- Place layouts in `app/layouts/`
+- Place utilities in `app/utils/`
+
+## Modern Tooling
+
+### pnpm Package Manager
+- **Use pnpm for all package management** - Faster, more efficient than npm/yarn
+- **Leverage workspace features** for monorepo support
+- **Strict dependency resolution** prevents phantom dependencies
+- **Global store** saves disk space and improves performance
+
+### Biome v2 Code Quality
+- **Single tool for linting and formatting** - No need for ESLint + Prettier
+- **Ultra-fast performance** - Written in Rust, 10-100x faster
+- **Zero configuration** - Sensible defaults out of the box
+- **Type-aware rules** - No TypeScript compiler dependency required
+- **Native TypeScript support** - Better parsing and type checking
+- **Use `pnpm check`** - Run both linting and formatting together
+
+## Development Patterns
+
+### Composables
+- Create reusable composables for common functionality
+- Use proper TypeScript generics for type safety
+- Implement proper cleanup with `onUnmounted`
+- Handle loading and error states consistently
+- Use `readonly` for returned reactive references
+
+### API Integration
+- Use `useFetch` for simple API calls
+- Use `useAsyncData` for complex data fetching logic
+- Implement proper error handling and loading states
+- Use server-side rendering when appropriate
+- Cache API responses appropriately
+
+### State Management
+- Use Pinia for global state management
+- Keep local state in components when possible
+- Use `useLocalStorage` for persistent state
+- Implement proper state validation and sanitization
+
+### Testing
+- Write unit tests for composables and utilities
+- Write integration tests for component interactions
+- Use proper mocking for external dependencies
+- Maintain high test coverage (80%+)
+- Test error conditions and edge cases
+
+## Performance Considerations
+
+### Optimization
+- Use lazy loading for non-critical components
+- Implement proper image optimization with `<NuxtImage>`
+- Use code splitting for large features
+- Minimize bundle size with tree shaking
+- Implement proper caching strategies
+
+### SEO and Meta
+- Use `useHead` for page-specific meta tags
+- Implement proper structured data
+- Use semantic HTML elements
+- Optimize for Core Web Vitals
+- Implement proper sitemap generation
+
+## Security Best Practices
+
+### Input Validation
+- Validate all user inputs on both client and server
+- Sanitize data before storing or displaying
+- Use proper CSRF protection
+- Implement rate limiting for API endpoints
+- Use HTTPS for all communications
+
+### Data Protection
+- Never expose sensitive data to the client
+- Use environment variables for configuration
+- Implement proper authentication and authorization
+- Use secure session management
+- Follow OWASP security guidelines
+
+## Common Patterns to Follow
+
+### Error Handling
+```typescript
+// Use proper error handling in composables
+export function useApiData<T>(url: string) {
+  const { data, error, pending } = useFetch<T>(url, {
+    onRequestError({ request, error }) {
+      console.error(`Request error for ${request}:`, error)
+    },
+    onResponseError({ response }) {
+      console.error(`Response error ${response.status}:`, response.statusText)
+    }
+  })
+
+  return { data, error, pending }
+}
+```
+
+### Component Structure
+```vue
+<template>
+  <div class="component-wrapper">
+    <!-- Use semantic HTML -->
+    <header v-if="title">
+      <h2>{{ title }}</h2>
+    </header>
+    
+    <main>
+      <slot />
+    </main>
+  </div>
+</template>
+
+<script setup lang="ts">
+interface Props {
+  title?: string
+}
+
+const props = defineProps<Props>()
+
+// Use proper error handling
+onErrorCaptured((error, instance, info) => {
+  console.error('Component error:', error, info)
+  return false
+})
+</script>
+```
+
+### Testing Pattern
+```typescript
+import { describe, it, expect } from 'vitest'
+import { useCounter } from '~/composables/useCounter'
+
+describe('useCounter', () => {
+  it('should initialize with default value', () => {
+    const { count } = useCounter()
+    expect(count.value).toBe(0)
+  })
+})
+```
+
+## Anti-patterns to Avoid
+
+### Don't Do
+- Don't use `any` type in TypeScript
+- Don't ignore TypeScript errors
+- Don't use inline styles when Tailwind classes are available
+- Don't create deeply nested component structures
+- Don't ignore accessibility requirements
+- Don't skip error handling
+- Don't use deprecated Nuxt 3 patterns in Nuxt 4
+
+### Common Mistakes
+- Forgetting to handle loading states
+- Not implementing proper error boundaries
+- Using wrong directory structure (old Nuxt 3 structure)
+- Not leveraging Nuxt 4's enhanced features
+- Ignoring performance optimizations
+- Not following TypeScript strict mode requirements
+
+## Template-Specific Guidelines
+
+### Using This Template
+- Start with the existing structure and patterns
+- Follow the established naming conventions
+- Use the provided composables as examples
+- Extend the testing setup as needed
+- Maintain consistency with the existing code style
+
+### Customization
+- Modify `app.config.ts` for app-wide configuration
+- Update `nuxt.config.ts` for build and module configuration
+- Customize Tailwind theme in `tailwind.config.js`
+- Add new composables following existing patterns
+- Extend the testing setup with new test types
+
+## Resources and References
+
+- [Nuxt 4 Documentation](https://nuxt.com/docs)
+- [Vue 3 Composition API](https://vuejs.org/guide/composition-api/)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [Vitest Documentation](https://vitest.dev/)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- [VueUse Documentation](https://vueuse.org/)
+
+Remember: This template is designed for modern development practices. Always prioritize code quality, type safety, and user experience.

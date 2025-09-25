@@ -1,0 +1,72 @@
+{
+  "name": "nuxt4-vibe-coding-template",
+  "version": "1.0.1",
+  "description": "A modern Nuxt 4 template with Cursor vibe coding setup and Vitest testing",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:run": "vitest run",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "eslint . --fix",
+    "format:check": "eslint .",
+    "check": "eslint .",
+    "check:fix": "eslint . --fix",
+    "typecheck": "nuxt typecheck",
+    "typecheck:tsc": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch"
+  },
+  "dependencies": {
+    "@nuxtjs/color-mode": "^3.5.1",
+    "@nuxtjs/tailwindcss": "^6.12.2",
+    "@pinia/nuxt": "^0.5.5",
+    "@vueuse/core": "^11.1.0",
+    "@vueuse/nuxt": "^11.1.0",
+    "nuxt": "^4.1.2",
+    "pinia": "^2.2.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^3.0.0",
+    "@nuxt/test-utils": "^3.13.0",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@testing-library/vue": "^8.1.0",
+    "@types/node": "^22.10.2",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/ui": "^3.2.4",
+    "@vue/test-utils": "^2.4.6",
+    "eslint": "^9.0.0",
+    "happy-dom": "^18.0.1",
+    "jsdom": "^25.0.1",
+    "prettier": "^3.0.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.4",
+    "vue-tsc": "^3.0.8"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [
+    "nuxt4",
+    "vue3",
+    "typescript",
+    "tailwindcss",
+    "vitest",
+    "cursor",
+    "template",
+    "boilerplate"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

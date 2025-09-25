@@ -1,0 +1,17 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./.nuxt/tsconfig.json" },
+    { "path": "./.nuxt/tsconfig.server.json" }
+  ],
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false
+  }
+}
